@@ -48,13 +48,16 @@ def printGroups(min_terms_dictionary):
 
     '''
     print('\n\n')
-    print('Group No. \t Binary of Minterms')
+    print('Group No. \t Binary of Minterms \t Minterms' )
     print('='*50)
 
     for i in min_terms_dictionary:
+        if not i:
+            continue
         print('\t' + str(i) + ':\n')
         for j in min_terms_dictionary[i]:
-            print('\t\t\t', j)
+
+            print('\t\t\t\t\t', j[0], '\t\t\t', j[1])
         print('-'*50)
 
 def categorize(min_terms, variables):
@@ -195,7 +198,7 @@ def getAllSelected(POS, temp, allSelected, index):
                 getAllSelected(POS, temp, allSelected, index + 1)
 
 
-def petrickMethod(table, selected_implicants):
+def tabulationMethod(table, selected_implicants):
     '''
 
     Args:
@@ -225,6 +228,7 @@ def getcount(mainList):
     '''
 
     Args:
+        mainList:b
 
 
     Returns:
@@ -288,19 +292,39 @@ def minimalize(prime_implicants, min_terms_categorised):
 
     getEssential(table, essential_implicants) # essential_implicants is full with essential prime implicants
 
-    printGroups(table)
-
     for i in essential_implicants: # Empties table of essential prime implicants similar to that if inside essential_implicants
         for j in i[1]:
             if j in [x for x in table]:
                 del table[j]
 
 
-    petrickMethod(table, selected_implicants)
+    tabulationMethod(table, selected_implicants)
     minimal_implicants = getminimal(selected_implicants)
 
     return essential_implicants, minimal_implicants
 
+def printImplicants(prime_implicants):
+    '''
+
+    Args:
+          prime_implicants: list of combined implicants
+    '''
+    prime_terms_categorised = {}
+
+    for i in range(len(prime_implicants)):
+        prime_terms_categorised[i] = []
+
+    index = 0
+
+    for i in prime_implicants:
+        temp = 0
+        for j in i[0]:
+            if j == '1':
+                temp += 1
+        prime_terms_categorised[temp].append(prime_implicants[index])  # Creates a dictionary with the number of 1's
+        index += 1
+
+    printGroups(prime_terms_categorised)
 
 def tabulation(variables, min_terms):
     prime_implicants = []
@@ -310,14 +334,17 @@ def tabulation(variables, min_terms):
     min_terms_categorised = categorize(min_terms, variables) # Takes a dictionary with the number of 1's
 
     getPrimeImplicants(min_terms_categorised, variables, prime_implicants) # Return prime_implicants
-    essential_implicants, selected_implicants = minimalize(prime_implicants, min_terms_categorised)
+    printImplicants(prime_implicants)
+    essential_implicants, selected_implicants = minimalize(prime_implicants, min_terms_categorised) # Return essential prime implicants
 
     for i in selected_implicants:
         functions.append(essential_implicants + i)
 
+    printImplicants(essential_implicants)
 
     prime_implicants = [x[0] for x in prime_implicants]
     essential_implicants = [x[0] for x in essential_implicants]
+
 
     for i in range(len(functions)):
         functions[i] = [x[0] for x in functions[i]]
