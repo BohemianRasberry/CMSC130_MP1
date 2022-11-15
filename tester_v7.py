@@ -1,3 +1,11 @@
+'''
+Reference: https://github.com/int-main/Quine-McCluskey
+Authors:
+    Danielle Azarraga
+    Stefani Gutierrez
+
+'''
+
 class Quine:
     def __init__(self, min_terms, dont_cares):
         '''
@@ -12,9 +20,13 @@ class Quine:
         self.__md = min_terms + dont_cares
 
     def __mul(self, x, y):
-        """
+        '''
         Multiply 2 minterms
-        """
+        Args:
+            self: necessary argument for a class
+            x: element
+        Return: list of multiplied expressions
+        '''
         result = []
         for i in x:
             if i + "'" in y or (len(i) == 2 and i[0] in y):
@@ -27,9 +39,15 @@ class Quine:
         return result
 
     def __multiply(self, x, y):
-        """
+        '''
         Multiply 2 expressions
-        """
+        Args:
+            self: necessary argument for a class
+            x: first expression
+            y: second expression
+        Return:
+            result: list of multiplied expressions
+        '''
         result = []
         for i in x:
             for j in y:
@@ -38,15 +56,15 @@ class Quine:
         return result
 
     def __refine(self, my_list, dc_list):
-        """
-        Xoa cac don't care khoi danh dach va tra ve danh sach da xoa
+        '''
+        Refines the list of prime implicants
         Args:
             self: necessary argument for a class
             my_list: list of merged terms
             dc_list: list of don't cares given by the user
         Return:
             result: list of items found in my_list but not in dc_list
-        """
+        '''
         result = []
         for i in my_list:
             if int(i) not in dc_list:
@@ -54,14 +72,14 @@ class Quine:
         return result
 
     def __findEPI(self, x):
-        """
+        '''
         Finds the prime implicants that are non repeating
         Args:
             self: necessary argument for a class
             x: dictionary of minterms and their corresponding binary terms
         Return:
-            result: All nonrepeating items in x
-        """
+            result: All non repeating items in x
+        '''
         result = []
         for i in x:
             if len(x[i]) == 1:
@@ -69,10 +87,14 @@ class Quine:
         return result
 
     def __find_variables(self, x):
-        """
-        Tim bien bieu dien boi cac minterms.\n
-        Vi du, minterm --01 duoc bieu dien boi C' va D
-        """
+        '''
+        Prints the function using normal variables
+        Args:
+            self: necessary argument for a class
+            x: terms from the list of essential prime implicants
+        Return:
+            var_list: list of needed variables for function
+        '''
         var_list = []
         for i in range(len(x)):
             if x[i] == '0':
@@ -81,29 +103,48 @@ class Quine:
                 var_list.append(chr(i + 65))
         return var_list
 
+    def __find_new_variables(self, x, variables):
+        '''
+        Prints the function based on the user's variables
+        Args:
+            self: necessary argument for a class
+            x: terms from the list of essential prime implicants
+            variables: list of variables given by the user
+        Return:
+            var_list: list of needed variables for function
+        '''
+        var_list = []
+        for i in range(len(x)):
+            if x[i] == '0':
+                var_list.append(variables[i] + "'")
+            elif x[i] == '1':
+                var_list.append(variables[i])
+        return var_list
+
+
     def __flatten(self, x):
-        """
+        '''
         Puts contents of dictionary temp in a list
         Args:
             self: necessary argument for a class
             x: dictionary of minterms
         Return:
              flattened_items: list of contents of dictionary x
-        """
+        '''
         flattened_items = []
         for i in x:
             flattened_items.extend(x[i])
         return flattened_items
 
     def __find_terms(self, a):
-        """
+        '''
         Finds the minterms with that should be grouped together
         Args:
             self: necessary argument for a class
             a: elements of set all_pi
         Return:
             List of grouped minterms
-        """
+        '''
         gaps = a.count('-')
         if gaps == 0:
             return [str(int(a, 2))]
@@ -122,7 +163,7 @@ class Quine:
         return temp
 
     def __compare(self, a, b):
-        """
+        '''
         Compares the if the binary terms differ by one bit
         Args:
             self: necessary argument for a class
@@ -131,8 +172,7 @@ class Quine:
         Return:
             Boolean: True or False
             mismatch_index: the index of where the two minterms have differed
-
-        """
+        '''
         mismatch_index = 0
         c = 0
         for i in range(len(a)):
@@ -144,14 +184,14 @@ class Quine:
         return True, mismatch_index
 
     def __remove_terms(self, _chart, terms):
-        """
-        Xoa terms da co trong chart
+        '''
+        Deletes elements from the chart that are essential prime implicants
         Args:
+            self: necessary argument for a class
+            _chart: dictionary of prime implicants
+            terms: list of essential prime implicants in binary
 
-        """
-        print('line 152')
-        print(terms)
-        print(_chart)
+        '''
         for i in terms:
             for j in self.__find_terms(i):
                 try:
@@ -160,9 +200,13 @@ class Quine:
                     pass
 
     def __group_primary(self, md, size):
-        """
-        Nhom cac minterm theo so chu so 1 (minterm), so 0 (maxterm)
-        """
+        '''
+        Creates a dictionary for minters + don't cares
+        Args:
+            self: necessary argument for a class
+            md: list of minterms and don't cares
+            size: size of largest binary
+        '''
         groups = {}
         for minterm in md:
             try:
@@ -174,12 +218,12 @@ class Quine:
         return groups
 
     def __print_group(self, groups):
-        """
+        '''
         Prints group to a chart
         Args:
             self: necessary argument for a class
             groups: dictionary of minterms + don't cares
-        """
+        '''
         print("\n\n\n\nGroup No.\tMinterms\tBinary of Minterms\n%s" %
             ('=' * 50))
         for i in sorted(groups.keys()):
@@ -191,7 +235,7 @@ class Quine:
             print('-' * 50)
 
     def __replace(self, temp, groups, m, marked, should_stop):
-        """
+        '''
         Replaces the similar numbers with "-"
         Args:
             self: necessary argument for a class
@@ -200,8 +244,13 @@ class Quine:
             m: index to be used for dictionary
             marked: set
             should_stop: boolean of whether should stop
+        Return:
+            groups: dictionary containing processed minterms
+            m: index to be used for dictionary
+            marked: set
+            should_stop: boolean of whether should stop
 
-        """
+        '''
         l = sorted(list(temp.keys())) # List of ordered keys of the temp dictionary
         for i in range(len(l) - 1):
             for j in temp[l[i]]:  # Loop which iterates through current group elements
@@ -220,6 +269,24 @@ class Quine:
             m += 1
 
         return groups, m, marked, should_stop
+
+    def __getVariables(self, varLen):
+        '''
+        Gets variables of user's choice
+        Args:
+            self: necessary argument for a class
+            varLen: size of largest binary number
+        Return:
+            variables: list of variables
+
+        '''
+        variables = []
+        print('Enter the variables you want to use: (Press enter for every new variable)')
+        for i in range(varLen):
+            print('Variable ' + str(i + 1) + ': ')
+            temp = input().upper()
+            variables.append(temp)
+        return variables
 
     def main(self):
         '''
@@ -277,8 +344,6 @@ class Quine:
                     chart[j] = [i]
             print('\n' + '-' * (len(min_terms) * (size + 1) + 16))
         # Printing and processing of Prime Implicant chart ends
-        print('line 270')
-        print(chart)
 
         EPI = self.__findEPI(chart)  # Finding essential prime implicants
         print("\nEssential Prime Implicants: " +
@@ -286,31 +351,51 @@ class Quine:
         # Remove EPI related columns from chart
         self.__remove_terms(chart, EPI)
 
-        if len(chart) == 0:  # If no minterms remain after removing EPI related columns
-            final_result = [self.__find_variables(i)
-                            for i in EPI]  # Final result with only EPIs
-        else:  # Else follow Petrick's method for further simplification
-            P = [[self.__find_variables(j) for j in chart[i]] for i in chart]
-            while len(P) > 1:  # Keep multiplying until we get the SOP form of P
-                P[1] = self.__multiply(P[0], P[1])
-                P.pop(0)
-            # Choosing the term with minimum variables from P
-            final_result = [min(P[0], key=len)]
-            final_result.extend(self.__find_variables(i)
-                                for i in EPI)  # Adding the EPIs to final solution
-        print('\n\nSolution: F = ' + ' + '.join(''.join(i)
-                                                for i in final_result))
+
+        choice = input('\n\n\nDo you want to use your own variables?\n')
+        if choice[0].lower() == 'y':
+            varLen = len(EPI[0])
+            variables = self.__getVariables(varLen) # User gets to choose their own variable
+            if len(chart) == 0:
+                final_result = [self.__find_new_variables(i, variables) for i in EPI]
+            else:  # Else follow Petrick's method for further simplification
+                P = [[self.__find_new_variables(j, variables) for j in chart[i]] for i in chart]
+                while len(P) > 1:  # Keep multiplying until we get the SOP form of P
+                    P[1] = self.__multiply(P[0], P[1])
+                    P.pop(0)
+                # Choosing the term with minimum variables from P
+                final_result = [min(P[0], key=len)]
+                final_result.extend(self.__find_new_variables(i,variables)
+                                    for i in EPI)  # Adding the EPIs to final solution
+            print('\n\nSolution: F = ' + ' + '.join(''.join(i)
+                                                    for i in final_result))
+        else:
+            if len(chart) == 0:  # If no minterms remain after removing EPI related columns
+                final_result = [self.__find_variables(i)
+                                for i in EPI]  # Final result with only EPIs
+            else:  # Else follow Petrick's method for further simplification
+                P = [[self.__find_variables(j) for j in chart[i]] for i in chart]
+                while len(P) > 1:  # Keep multiplying until we get the SOP form of P
+                    P[1] = self.__multiply(P[0], P[1])
+                    P.pop(0)
+                # Choosing the term with minimum variables from P
+                final_result = [min(P[0], key=len)]
+                final_result.extend(self.__find_variables(i)
+                                    for i in EPI)  # Adding the EPIs to final solution
+            print('\n\nSolution: F = ' + ' + '.join(''.join(i)
+                                                    for i in final_result))
 
 
 if __name__ == "__main__":
     while True:
-        min_terms = [int(i)
-                for i in input("Enter the minterms: ").strip().split()]
-        dont_cares = [int(i) for i in input("Enter the don't cares: ").strip().split()]
+        min_terms = [int(i) for i in input("Enter the minterms: ").strip().split()]
+        dont_cares = []
+        # dont_cares = [int(i) for i in input("Enter the don't cares: ").strip().split()]
 
         Quine(min_terms, dont_cares).main()
         check = input("Do you want to quit? (Y/N) ")
-        if check == 'Y' or check == 'y':
+        print(check)
+        if check[0].lower() == 'y':
             break
 
     input("\nPress enter to exit...")
